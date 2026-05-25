@@ -231,7 +231,7 @@ export default function NotificationBell() {
       if (n.data?.subscription_id) {
         setSelectedNotification(n);
       } else {
-        navigate('/admin');
+        navigate('/admin?highlight=' + n.data?.appointment_id);
       }
       return;
     }

@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import api from '../lib/axios';
 import { useTranslation } from 'react-i18next';
 
@@ -48,12 +49,15 @@ function StatusModal({ action, appointment, message, onMessageChange, onSubmit, 
 
 export default function AdminDashboard() {
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
+  const highlightId = searchParams.get('highlight');
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(new Set());
   const [statusModal, setStatusModal] = useState(null);
   const [statusMessage, setStatusMessage] = useState('');
   const [filter, setFilter] = useState('all');
+  const rowRefs = useRef({});
 
   const fetch = (statusFilter) => {
     const params = statusFilter && statusFilter !== 'all' ? { status: statusFilter } : {};
@@ -64,6 +68,17 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => { fetch(filter); }, [filter]);
+
+  useEffect(() => {
+    if (!highlightId || appointments.length === 0) return;
+    const timer = setTimeout(() => {
+      const el = rowRefs.current[highlightId];
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [highlightId, appointments]);
 
   const openStatusModal = (apt, action) => {
     setStatusMessage('');
@@ -176,7 +191,12 @@ export default function AdminDashboard() {
                     {appointments.map((apt, idx) => (
                       <tr
                         key={apt.id}
-                        className="hover:bg-forest/5 transition-colors animate-fade-in"
+                        ref={(el) => { if (el) rowRefs.current[apt.id] = el; }}
+                        className={`transition-colors animate-fade-in ${
+                          highlightId && String(apt.id) === highlightId
+                            ? 'bg-sage/20 ring-2 ring-sage ring-inset'
+                            : 'hover:bg-forest/5'
+                        }`}
                         style={{ animationDelay: `${idx * 30}ms` }}
                       >
                       <td className="text-left py-4 px-6">
