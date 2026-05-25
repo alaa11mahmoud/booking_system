@@ -256,12 +256,7 @@ export default function LandingPage() {
                   </svg>
                   {t('landing.book_btn')}
                 </button>
-                <Link
-                  to="/login"
-                  className="inline-flex items-center gap-2 border border-white/30 text-white px-8 py-3.5 rounded-full font-medium hover:bg-white/10 transition-all active:scale-95"
-                >
-                  {t('landing.signin_btn')}
-                </Link>
+
               </div>
 
               {socialLinks.length > 0 && (

@@ -88,7 +88,7 @@ export default function Navbar() {
               <>
                 <Link
                   to="/login"
-                  className="hidden md:inline-flex px-5 py-2.5 rounded-full border border-sage/30 text-forest/70 text-sm font-medium hover:bg-forest/5 hover:text-forest transition-all active:scale-95"
+                  className="inline-flex px-5 py-2.5 rounded-full border border-sage/30 text-forest/70 text-sm font-medium hover:bg-forest/5 hover:text-forest transition-all active:scale-95"
                 >
                   {t('nav.login')}
                 </Link>
