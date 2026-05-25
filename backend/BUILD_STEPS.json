@@ -1,0 +1,252 @@
+{
+  "project": "Dr. Halla Appointment Booking System",
+  "version": "1.0.0",
+  "date": "2026-05-11",
+  "stack": {
+    "backend": "Laravel 12 (API-only, PHP 8.2.12)",
+    "frontend": "React 18 + Vite + Tailwind CSS",
+    "database": "SQLite",
+    "auth": "Laravel Sanctum",
+    "realtime": "Laravel Echo + Pusher"
+  },
+  "steps": [
+    {
+      "step": 1,
+      "title": "Create project structure",
+      "commands": [
+        "mkdir clinic",
+        "cd clinic"
+      ],
+      "details": "Root directory for both backend and frontend"
+    },
+    {
+      "step": 2,
+      "title": "Create Laravel backend",
+      "commands": [
+        "composer create-project laravel/laravel backend"
+      ],
+      "details": "Installed Laravel 12 (v12.12.2) because PHP 8.2.12 does not satisfy Laravel 11's PHP 8.3 requirement"
+    },
+    {
+      "step": 3,
+      "title": "Install Sanctum for API auth",
+      "commands": [
+        "cd backend",
+        "php artisan install:api --no-interaction"
+      ],
+      "details": "Installs laravel/sanctum v4.3.2, publishes API routes file, runs personal_access_tokens migration"
+    },
+    {
+      "step": 4,
+      "title": "Install Pusher for broadcasting",
+      "commands": [
+        "composer require pusher/pusher-php-server --no-interaction"
+      ],
+      "details": "required for Laravel Echo + Pusher real-time status updates"
+    },
+    {
+      "step": 5,
+      "title": "Create directory structure",
+      "commands": [
+        "mkdir backend/app/Enums",
+        "mkdir backend/app/Services",
+        "mkdir backend/app/Events",
+        "mkdir backend/app/Mail",
+        "mkdir backend/app/Http/Controllers/Api",
+        "mkdir backend/resources/views/emails"
+      ],
+      "details": "Organized backend code into logical directories"
+    },
+    {
+      "step": 6,
+      "title": "Create Enums",
+      "files": [
+        "backend/app/Enums/UserRole.php",
+        "backend/app/Enums/AppointmentStatus.php"
+      ],
+      "details": "UserRole: admin, patient. AppointmentStatus: pending, approved, rejected."
+    },
+    {
+      "step": 7,
+      "title": "Create Models",
+      "files": [
+        "backend/app/Models/User.php - added HasApiTokens, role cast, patient relationship, isAdmin/isPatient helpers",
+        "backend/app/Models/Patient.php - user_id FK, phone, date_of_birth, gender, address",
+        "backend/app/Models/WorkingHour.php - day_of_week, start_time, end_time, is_active",
+        "backend/app/Models/Appointment.php - patient_id FK, status, appointment_date, start_time, end_time",
+        "backend/app/Models/CmsAbout.php - title, content, image_url, is_active",
+        "backend/app/Models/Course.php - title, description, price, image_url, sort_order, is_active",
+        "backend/app/Models/Video.php - title, url, description, sort_order, is_active"
+      ],
+      "details": "All models with fillable, casts, and relationships"
+    },
+    {
+      "step": 8,
+      "title": "Create Migrations",
+      "files": [
+        "database/migrations/2026_05_11_130000_add_role_to_users_table.php",
+        "database/migrations/2026_05_11_130001_create_patients_table.php",
+        "database/migrations/2026_05_11_130002_create_working_hours_table.php",
+        "database/migrations/2026_05_11_130003_create_appointments_table.php",
+        "database/migrations/2026_05_11_130004_create_cms_abouts_table.php",
+        "database/migrations/2026_05_11_130005_create_courses_table.php",
+        "database/migrations/2026_05_11_130006_create_videos_table.php"
+      ],
+      "details": "7 new migrations. Appointments has composite indexes on (date, status) and (patient_id, date)"
+    },
+    {
+      "step": 9,
+      "title": "Create Event (Broadcast)",
+      "files": [
+        "backend/app/Events/AppointmentStatusUpdated.php"
+      ],
+      "details": "Broadcasts on channel 'appointments.{patient_id}' with appointment id, status, date, time"
+    },
+    {
+      "step": 10,
+      "title": "Create Mailable",
+      "files": [
+        "backend/app/Mail/AppointmentApprovedMail.php",
+        "backend/resources/views/emails/appointment-approved.blade.php"
+      ],
+      "details": "Queued email sent to patient when appointment is approved"
+    },
+    {
+      "step": 11,
+      "title": "Create SlotService",
+      "files": [
+        "backend/app/Services/SlotService.php"
+      ],
+      "details": "Generates 2-minute slots from working_hours for a given date. Filters out slots with pending/approved appointments (locked slots). Each slot = {start_time, end_time, formatted}"
+    },
+    {
+      "step": 12,
+      "title": "Create Controllers",
+      "files": [
+        "backend/app/Http/Controllers/Api/AuthController.php - register, login, logout, user",
+        "backend/app/Http/Controllers/Api/SlotController.php - GET /api/slots?date=",
+        "backend/app/Http/Controllers/Api/BookingController.php - CRUD + status PATCH",
+        "backend/app/Http/Controllers/Api/CmsController.php - public CMS endpoints",
+        "backend/app/Http/Controllers/Api/WorkingHourController.php - admin manages schedule",
+        "backend/app/Http/Controllers/Api/AdminCmsController.php - admin manages CMS content",
+        "backend/app/Http/Controllers/Api/NotificationController.php - list, mark read, mark all read"
+      ],
+      "details": "7 controllers. BookingController.updateStatus triggers Mail, Broadcast, and DB Notification"
+    },
+    {
+      "step": 13,
+      "title": "Create Notification",
+      "files": [
+        "backend/app/Notifications/AppointmentStatusNotification.php"
+      ],
+      "details": "Database notification sent to patient user when appointment status changes"
+    },
+    {
+      "step": 14,
+      "title": "Configure Routes",
+      "files": [
+        "backend/routes/api.php - all API endpoints",
+        "backend/routes/channels.php - broadcast channel auth"
+      ],
+      "details": "24 API routes total. Public: login, register, CMS. Protected: bookings, slots, notifications, working-hours, admin CMS"
+    },
+    {
+      "step": 15,
+      "title": "Configure .env",
+      "files": [
+        "backend/.env"
+      ],
+      "details": "Set APP_NAME, BROADCAST_CONNECTION=pusher, QUEUE_CONNECTION=sync, Pusher credentials, MAIL_MAILER=log, FRONTEND_URL"
+    },
+    {
+      "step": 16,
+      "title": "Configure bootstrap/app.php",
+      "files": [
+        "backend/bootstrap/app.php"
+      ],
+      "details": "Added channels routing, HandleCors middleware, statefulApi for SPA auth"
+    },
+    {
+      "step": 17,
+      "title": "Publish broadcasting config",
+      "commands": [
+        "php artisan config:publish broadcasting"
+      ],
+      "details": "Creates config/broadcasting.php for Pusher settings"
+    },
+    {
+      "step": 18,
+      "title": "Create DatabaseSeeder",
+      "files": [
+        "backend/database/seeders/DatabaseSeeder.php"
+      ],
+      "details": "Seeds: Dr. Halla (admin), John Patient (patient), Mon-Fri 9-5 working hours, 1 about entry, 3 courses, 2 videos"
+    },
+    {
+      "step": 19,
+      "title": "Run migrations and seeders",
+      "commands": [
+        "php artisan migrate:fresh --seed"
+      ],
+      "details": "All 11 tables created and seeded successfully"
+    },
+    {
+      "step": 20,
+      "title": "Start Laravel dev server",
+      "commands": [
+        "php artisan serve --port=8000"
+      ],
+      "details": "Server running at http://127.0.0.1:8000"
+    }
+  ],
+  "api_endpoints": {
+    "auth": {
+      "POST /api/register": "Register new patient (name, email, password, password_confirmation)",
+      "POST /api/login": "Login (email, password) returns user + token",
+      "POST /api/logout": "Revoke current token (auth required)",
+      "GET /api/user": "Get authenticated user with patient profile"
+    },
+    "slots": {
+      "GET /api/slots?date=YYYY-MM-DD": "Get available 2-min time slots for a date"
+    },
+    "bookings": {
+      "GET /api/bookings": "List bookings (patient sees own, admin sees all)",
+      "POST /api/bookings": "Create booking (appointment_date, start_time, patient_notes)",
+      "GET /api/bookings/{id}": "Get single booking",
+      "PATCH /api/bookings/{id}/status": "Update status to approved/rejected (admin only)"
+    },
+    "cms": {
+      "GET /api/cms/about": "Get active About section",
+      "GET /api/cms/courses": "Get active courses",
+      "GET /api/cms/videos": "Get active videos",
+      "PUT /api/cms/about": "Update about section (admin)",
+      "POST /api/cms/courses": "Create course (admin)",
+      "PUT /api/cms/courses/{id}": "Update course (admin)",
+      "DELETE /api/cms/courses/{id}": "Delete course (admin)",
+      "POST /api/cms/videos": "Create video (admin)",
+      "PUT /api/cms/videos/{id}": "Update video (admin)",
+      "DELETE /api/cms/videos/{id}": "Delete video (admin)"
+    },
+    "working_hours": {
+      "GET /api/working-hours": "Get all working hours",
+      "PUT /api/working-hours": "Bulk update working hours (admin)"
+    },
+    "notifications": {
+      "GET /api/notifications": "Get user notifications",
+      "PATCH /api/notifications/{id}/read": "Mark single notification as read",
+      "POST /api/notifications/mark-all-read": "Mark all as read"
+    }
+  },
+  "database_schema": {
+    "users": ["id", "name", "email", "password", "role (admin|patient)", "remember_token", "timestamps"],
+    "patients": ["id", "user_id (FK unique)", "phone", "date_of_birth", "gender", "address", "timestamps"],
+    "working_hours": ["id", "day_of_week (0-6)", "start_time", "end_time", "is_active"],
+    "appointments": ["id", "patient_id (FK)", "status (pending|approved|rejected)", "appointment_date", "start_time", "end_time", "patient_notes", "cancellation_reason"],
+    "cms_abouts": ["id", "title", "content", "image_url", "is_active"],
+    "courses": ["id", "title", "description", "price", "image_url", "sort_order", "is_active"],
+    "videos": ["id", "title", "url", "description", "sort_order", "is_active"],
+    "notifications": "Laravel native polymorphic notifications table",
+    "personal_access_tokens": "Sanctum tokens table"
+  },
+  "frontend_status": "not yet built — pending Vite + React + Tailwind setup"
+}

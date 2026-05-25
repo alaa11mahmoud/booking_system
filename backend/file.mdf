@@ -1,0 +1,431 @@
+# Clinic Project Documentation (file.mdf)
+
+## Project Overview
+
+- **Name:** عيادة د. هالة (Dr. Halla Clinic)
+- **Type:** Appointment Booking System
+- **Version:** 1.0.0
+- **Stack:** Laravel 12 (API) + React 18 (SPA frontend pending) + MySQL
+- **Auth:** Laravel Sanctum (SPA stateful API)
+- **Broadcasting:** Pusher (WebSockets)
+- **Queue:** sync (dev), database (prod)
+- **Cache:** database
+- **Session:** database
+
+---
+
+## Environment (.env)
+
+| Key | Value |
+|-----|-------|
+| APP_NAME | عيادة د. هالة |
+| APP_ENV | local |
+| APP_DEBUG | true |
+| APP_URL | http://localhost:8000 |
+| APP_LOCALE | ar |
+| DB_DATABASE | clinic |
+| QUEUE_CONNECTION | sync |
+| CACHE_STORE | database |
+| SESSION_DRIVER | database |
+| FRONTEND_URL | http://localhost:5173 |
+| MAIL_MAILER | smtp (gmail) |
+| PUSHER_APP_ID | clinic-app |
+
+---
+
+## Directory Structure
+
+```
+backend/
+├── app/
+│   ├── Enums/
+│   │   ├── AppointmentStatus.php
+│   │   └── UserRole.php
+│   ├── Events/
+│   │   └── AppointmentStatusUpdated.php
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   ├── Controller.php              (abstract base)
+│   │   │   └── Api/
+│   │   │       ├── AuthController.php
+│   │   │       ├── BookingController.php
+│   │   │       ├── SlotController.php
+│   │   │       ├── CmsController.php
+│   │   │       ├── AdminCmsController.php
+│   │   │       ├── WorkingHourController.php
+│   │   │       └── NotificationController.php
+│   │   └── (No Form Requests - inline validation)
+│   ├── Mail/
+│   │   ├── AppointmentApprovedMail.php
+│   │   └── AppointmentRejectedMail.php
+│   ├── Models/
+│   │   ├── User.php
+│   │   ├── Patient.php
+│   │   ├── Appointment.php
+│   │   ├── WorkingHour.php
+│   │   ├── CmsAbout.php
+│   │   ├── Course.php
+│   │   ├── Video.php
+│   │   ├── Certification.php
+│   │   └── Post.php
+│   ├── Notifications/
+│   │   └── AppointmentStatusNotification.php
+│   ├── Providers/
+│   │   └── AppServiceProvider.php
+│   └── Services/
+│       └── SlotService.php
+├── bootstrap/
+│   └── app.php
+├── config/
+│   ├── app.php
+│   ├── auth.php
+│   ├── broadcasting.php
+│   ├── cache.php
+│   ├── database.php
+│   ├── filesystems.php
+│   ├── logging.php
+│   ├── mail.php
+│   ├── queue.php
+│   ├── sanctum.php
+│   ├── services.php
+│   └── session.php
+├── database/
+│   ├── factories/
+│   │   └── UserFactory.php
+│   ├── migrations/
+│   │   ├── 0001_01_01_000000_create_users_table.php
+│   │   ├── 0001_01_01_000001_create_cache_table.php
+│   │   ├── 0001_01_01_000002_create_jobs_table.php
+│   │   ├── 2026_05_11_124550_create_personal_access_tokens_table.php
+│   │   ├── 2026_05_11_130000_add_role_to_users_table.php
+│   │   ├── 2026_05_11_130001_create_patients_table.php
+│   │   ├── 2026_05_11_130002_create_working_hours_table.php
+│   │   ├── 2026_05_11_130003_create_appointments_table.php
+│   │   ├── 2026_05_11_130004_create_cms_abouts_table.php
+│   │   ├── 2026_05_11_130005_create_courses_table.php
+│   │   ├── 2026_05_11_130006_create_videos_table.php
+│   │   ├── 2026_05_11_173133_create_notifications_table.php
+│   │   ├── 2026_05_12_140000_create_certifications_table.php
+│   │   ├── 2026_05_12_150000_add_file_url_to_videos_table.php
+│   │   ├── 2026_05_12_160000_add_cover_url_to_videos_table.php
+│   │   └── 2026_05_13_000000_create_posts_table.php
+│   └── seeders/
+│       └── DatabaseSeeder.php
+├── lang/
+│   └── ar/
+│       └── messages.php  (43 Arabic strings)
+├── resources/
+│   └── views/
+│       ├── welcome.blade.php
+│       └── emails/
+│           ├── appointment-approved.blade.php
+│           └── appointment-rejected.blade.php
+├── routes/
+│   ├── api.php
+│   ├── web.php
+│   ├── channels.php
+│   └── console.php
+├── composer.json
+├── package.json
+├── BUILD_STEPS.json
+└── vite.config.js
+```
+
+---
+
+## Database Schema (13 tables)
+
+### users
+| Column | Type | Notes |
+|--------|------|-------|
+| id | bigint AI PK | |
+| name | varchar | |
+| email | varchar unique | |
+| password | varchar | |
+| role | enum(admin,patient) | Added via migration |
+| remember_token | varchar nullable | |
+| timestamps | | |
+
+### patients
+| Column | Type | Notes |
+|--------|------|-------|
+| id | bigint AI PK | |
+| user_id | bigint FK unique | -> users.id |
+| phone | varchar nullable | |
+| date_of_birth | date nullable | |
+| gender | varchar nullable | |
+| address | text nullable | |
+| timestamps | | |
+
+### working_hours
+| Column | Type | Notes |
+|--------|------|-------|
+| id | bigint AI PK | |
+| day_of_week | tinyint (0-6) | |
+| start_time | time | |
+| end_time | time | |
+| is_active | boolean default true | |
+| timestamps | | |
+
+### appointments
+| Column | Type | Notes |
+|--------|------|-------|
+| id | bigint AI PK | |
+| patient_id | bigint FK | -> patients.id |
+| appointment_date | date | |
+| start_time | time | |
+| end_time | time | |
+| status | enum(pending,approved,rejected) | default pending |
+| patient_notes | text nullable | |
+| cancellation_reason | text nullable | |
+| timestamps | | |
+
+Indexes: (appointment_date, status), (patient_id, appointment_date)
+
+### cms_abouts
+| Column | Type | Notes |
+|--------|------|-------|
+| id | bigint AI PK | |
+| title | varchar | |
+| content | text | |
+| image_url | varchar nullable | |
+| is_active | boolean default true | |
+| timestamps | | |
+
+### courses
+| Column | Type | Notes |
+|--------|------|-------|
+| id | bigint AI PK | |
+| title | varchar | |
+| description | text nullable | |
+| price | decimal(8,2) nullable | |
+| image_url | varchar nullable | |
+| sort_order | integer default 0 | |
+| is_active | boolean default true | |
+| timestamps | | |
+
+### videos
+| Column | Type | Notes |
+|--------|------|-------|
+| id | bigint AI PK | |
+| title | varchar | |
+| url | varchar nullable | (YouTube link) |
+| file_url | varchar nullable | (Uploaded file) |
+| cover_url | varchar nullable | |
+| description | text nullable | |
+| sort_order | integer default 0 | |
+| is_active | boolean default true | |
+| timestamps | | |
+
+### certifications
+| Column | Type | Notes |
+|--------|------|-------|
+| id | bigint AI PK | |
+| title | varchar | |
+| image_url | varchar nullable | |
+| sort_order | integer default 0 | |
+| is_active | boolean default true | |
+| timestamps | | |
+
+### posts
+| Column | Type | Notes |
+|--------|------|-------|
+| id | bigint AI PK | |
+| title | varchar | |
+| content | text | |
+| session_time | integer nullable | Minutes |
+| price | decimal(8,2) nullable | |
+| max_members | integer nullable | |
+| image_url | varchar nullable | |
+| sort_order | integer default 0 | |
+| is_active | boolean default true | |
+| timestamps | | |
+
+### Notifications (Laravel polymorphic)
+### personal_access_tokens (Sanctum)
+### cache (Laravel)
+### jobs (Laravel queue)
+
+---
+
+## Enums
+
+### UserRole
+- `Admin = 'admin'`
+- `Patient = 'patient'`
+
+### AppointmentStatus
+- `Pending = 'pending'`  -> label: "قيد الانتظار"
+- `Approved = 'approved'` -> label: "تم الموافقة"
+- `Rejected = 'rejected'` -> label: "تم الرفض"
+
+---
+
+## API Endpoints (24 total)
+
+### Public (7)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /api/register | Register new patient (name, email, password, password_confirmation, phone, date_of_birth, gender, address) |
+| POST | /api/login | Login (email, password) -> token |
+| GET | /api/slots?date= | Available time slots for date |
+| GET | /api/cms/about | Active about section |
+| GET | /api/cms/courses | Active courses (sorted) |
+| GET | /api/cms/videos | Active videos (sorted) |
+| GET | /api/cms/certifications | Active certifications (sorted) |
+| GET | /api/cms/posts | Active posts (sorted) |
+| GET | /api/cms/posts/{id} | Single post |
+
+### Authenticated (Patient/Admin) (13)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /api/logout | Revoke current token |
+| GET | /api/user | Current user with patient profile |
+| GET | /api/bookings | List bookings (own or all if admin), filter by status, paginated 20 |
+| POST | /api/bookings | Create appointment (appointment_date, start_time, end_time, patient_notes) |
+| GET | /api/bookings/{id} | View single appointment (ownership check) |
+| PATCH | /api/bookings/{id}/status | Approve/reject (admin only) |
+| GET | /api/notifications | Paginated 20 |
+| PATCH | /api/notifications/{id}/read | Mark single read |
+| POST | /api/notifications/mark-all-read | Mark all read |
+| GET | /api/working-hours | Get all working hours ordered |
+| PUT | /api/working-hours | Update schedule (admin, truncate+bulk insert) |
+| PUT | /api/cms/about | Update about (admin) |
+| POST | /api/cms/posts | Create post (admin) |
+| PUT | /api/cms/posts/{id} | Update post (admin) |
+| DELETE | /api/cms/posts/{id} | Delete post (admin) |
+| POST | /api/upload | Upload image (max 20MB, jpeg/png/jpg/gif/webp) (admin) |
+| POST | /api/upload-video | Upload video (max 200MB, mp4/mov/avi/webm/mkv) (admin) |
+
+### Admin CMS (9)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /api/cms/courses | Create course |
+| PUT | /api/cms/courses/{id} | Update course |
+| DELETE | /api/cms/courses/{id} | Delete course |
+| POST | /api/cms/videos | Create video |
+| PUT | /api/cms/videos/{id} | Update video |
+| DELETE | /api/cms/videos/{id} | Delete video |
+| POST | /api/cms/certifications | Create certification |
+| PUT | /api/cms/certifications/{id} | Update certification |
+| DELETE | /api/cms/certifications/{id} | Delete certification |
+
+---
+
+## Models & Relationships
+
+```
+User (1) --- (1) Patient (1) --- (*) Appointment
+WorkingHour (standalone)
+CmsAbout (standalone)
+Course (standalone)
+Video (standalone)
+Certification (standalone)
+Post (standalone)
+```
+
+- **User:** HasApiTokens, HasOne(Patient), isAdmin()/isPatient() checkers
+- **Patient:** BelongsTo(User), HasMany(Appointment), date casts
+- **Appointment:** BelongsTo(Patient), status casts to AppointmentStatus, date casts
+- All CMS models: is_active boolean, sort_order integer
+
+---
+
+## Notifications & Broadcasting Flow
+
+1. Admin updates appointment status (BookingController@updateStatus)
+2. AppointmentStatusUpdated event is broadcast via Pusher to channel `appointments.{patientId}`
+3. AppointmentStatusNotification is stored in DB (Laravel notifications table)
+4. AppointmentApprovedMail or AppointmentRejectedMail is sent via SMTP
+
+---
+
+## SlotService Logic
+
+- SLOT_DURATION_MINUTES = 60
+- Fetches active working hours for requested day_of_week
+- Generates 60-minute slots from start_time to end_time
+- Removes slots overlapping with existing pending/approved appointments
+- Returns available slots with time + availability status
+
+---
+
+## Email Templates (RTL Arabic)
+
+- **approved:** Green theme (#059669), congratulatory message with date/time
+- **rejected:** Red theme (#dc2626), includes rejection reason
+
+---
+
+## Seeder Data
+
+- **Admin:** drhalla@clinic.com / password
+- **Patient:** patient@example.com / password
+- **Working Hours:** Mon-Fri 09:00-17:00
+- **CMS About:** 1 entry (عيادة د. هالة للتجميل)
+- **Courses:** 3 courses ($49.99 - $149.99)
+- **Videos:** 2 entries
+- **Certifications:** 4 entries
+- **Posts:** 3 entries (جلسة استشارية فردية, ورشة عمل إدارة الضغوط, برنامج العلاج الجماعي)
+
+---
+
+## Routes Configuration
+
+- **api.php:** All API routes under `/api`
+- **web.php:** Serves frontend SPA assets + catch-all for React router
+- **channels.php:** Broadcast auth for `appointments.{patientId}`
+- **console.php:** Inspire command
+
+---
+
+## Middleware
+
+- `auth:sanctum` for protected API routes
+- Admin-only checks done within controllers via `$user->isAdmin()`
+- `HandleCors` added to API group in bootstrap/app.php
+- `statefulApi()` configured for SPA authentication
+
+---
+
+## Recent Changes (Session 2026-05-13)
+
+### 1. Notification Bell – Admin Redirect with Appointment Highlight
+- **File:** `frontend/src/components/NotificationBell.jsx`
+- Admin clicking an appointment notification navigates to `/admin?appointment_id=X`
+- Admin clicking a **subscription** notification (`data.subscription_id`) opens the existing modal showing patient name + post title
+- Dropdown closes automatically before navigation/modal
+
+### 2. AdminDashboard – Highlighted Row from Notification
+- **File:** `frontend/src/pages/AdminDashboard.jsx`
+- Reads `?appointment_id=` from URL query params
+- Highlights matching row with a pulsing green glow animation (`pulseBorder` keyframes)
+- Auto-scrolls to the highlighted row (`scrollIntoView` smooth)
+
+### 3. Completed Appointment Status
+- **Enum:** `app/Enums/AppointmentStatus.php` — added `Completed = 'completed'`
+- **Endpoint:** `POST /api/bookings/complete-past` — moves all `approved` appointments with `appointment_date < today` to `completed`
+- **Controller:** `BookingController@completePast` — admin-only batch update
+- **Frontend:** AdminDashboard auto-calls `completePast` on mount (silent), then fetches bookings
+- **Translation:** Added `status_completed` ("مكتمل") and `completed_past` to `lang/ar/messages.php`
+- **Filter button:** "مكتمل" filter added to AdminDashboard
+- **Styling:** Completed status uses gray (neutral, not blue)
+
+### 4. Posts Page – Disable "احجز الجلسة" When Already Subscribed
+- **File:** `frontend/src/pages/PostsPage.jsx`
+- Removed `{!post.is_subscribed && ...}` wrapper (button always rendered)
+- Button is disabled when `post.is_subscribed` is true
+- Text shows `"تم الحجز"` (Already booked) instead of `"احجز الجلسة"`
+- Spots-full (`available_spots === 0`) shows `"ممتلئ"` (Full) — unchanged
+
+### 5. Table Alignment Fixes
+- **File:** `frontend/src/pages/AdminDashboard.jsx`
+- Patient column: `text-left` / header `text-left`
+- Email, Date, Time, Status, Actions columns: `text-center` / headers `text-center`
+
+---
+
+## Known Issues / TODOs
+
+- Chunk size warning (>500 kB) during Vite build — non-blocking
+- Frontend locale file (`ar.json`) has `done` translation key that is no longer used (cleanup optional)

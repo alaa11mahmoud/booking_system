@@ -1,0 +1,51 @@
+<?php
+
+return [
+    'incorrect_password' => 'كلمة المرور غير صحيحة',
+    'logged_out' => 'تم تسجيل الخروج بنجاح',
+    'slot_not_available' => 'هذه الفترة الزمنية غير متوفرة.',
+    'slot_taken' => 'لقد تم حجز هذه الفترة الزمنية للتو.',
+    'forbidden' => 'غير مصرح',
+    'appointment_already' => 'الموعد بالفعل :status',
+    'notification_read' => 'تم تحديد الإشعار كمقروء',
+    'all_notifications_read' => 'تم تحديد جميع الإشعارات كمقروءة',
+    'course_deleted' => 'تم حذف الدورة',
+    'video_deleted' => 'تم حذف الفيديو',
+    'certification_deleted' => 'تم حذف الشهادة',
+    'working_hours_updated' => 'تم تحديث ساعات العمل بنجاح',
+    'frontend_not_built' => 'الواجهة الأمامية غير مبنية. قم بتشغيل: cd frontend && npm run build',
+
+    'appointment_approved_subject' => 'تم الموافقة على الموعد - عيادة د. هالة',
+    'appointment_rejected_subject' => 'تم رفض الموعد - عيادة د. هالة',
+
+    'appointment_approved_title' => 'تم الموافقة على الموعد',
+    'appointment_rejected_title' => 'تم رفض الموعد',
+    'dear' => 'عزيزي/عزيزتي',
+    'appointment_approved_body' => 'تمت الموافقة على موعدك مع <strong>د. هالة</strong>.',
+    'appointment_rejected_body' => 'للأسف، تم رفض موعدك مع <strong>د. هالة</strong>.',
+    'date_label' => 'التاريخ:',
+    'time_label' => 'الوقت:',
+    'reason_label' => 'السبب:',
+    'approved_instruction' => 'يرجى الحضور في الوقت المحدد. إذا كنت بحاجة إلى إعادة جدولة، يرجى الاتصال بنا.',
+    'rejected_instruction' => 'إذا كان لديك أي استفسار، يرجى الاتصال بنا.',
+    'best_regards' => 'مع أطيب التحيات،<br>عيادة د. هالة',
+
+    'notification_message_approved' => 'تمت الموافقة على موعدك',
+    'notification_message_rejected' => 'تم رفض موعدك',
+    'notification_message_pending' => 'موعدك قيد الانتظار',
+
+    'status_pending' => 'قيد الانتظار',
+    'status_approved' => 'تمت الموافقة',
+    'status_rejected' => 'مرفوض',
+    'status_completed' => 'مكتمل',
+
+    'app_name' => 'عيادة د. هالة',
+    'upload_failed' => 'فشل رفع الصورة',
+    'post_deleted' => 'تم حذف المنشور',
+    'not_found' => 'غير موجود',
+    'already_subscribed' => 'أنت مشترك بالفعل في هذه الجلسة',
+    'session_full' => 'الجلسة ممتلئة، لا توجد مقاعد متاحة',
+    'session_ended' => 'لقد انتهت الجلسة، لا يمكن الاشتراك',
+    'subscription_cancelled' => 'تم إلغاء الاشتراك بنجاح',
+    'completed_past' => 'تم إكمال :count موعد/مواعيد سابقة',
+];
