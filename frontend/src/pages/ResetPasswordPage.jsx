@@ -1,13 +1,16 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import api from '../lib/axios';
 import { useTranslation } from 'react-i18next';
 
-export default function LoginPage() {
+export default function ResetPasswordPage() {
   const { t } = useTranslation();
-  const { login } = useAuth();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: '', password: '' });
+  const token = searchParams.get('token');
+  const email = searchParams.get('email');
+
+  const [form, setForm] = useState({ password: '', password_confirmation: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -16,14 +19,32 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      await login(form.email, form.password);
-      navigate('/posts');
+      await api.post('/reset-password', {
+        token,
+        email,
+        password: form.password,
+        password_confirmation: form.password_confirmation,
+      });
+      navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.message || t('login.error'));
+      setError(err.response?.data?.message || t('reset_password.error'));
     } finally {
       setLoading(false);
     }
   };
+
+  if (!token || !email) {
+    return (
+      <div className="min-h-[90vh] flex items-center justify-center bg-cream px-4 py-12">
+        <div className="bg-white rounded-2xl border border-sage/10 p-8 shadow-sm max-w-md w-full text-center">
+          <p className="text-red-400 mb-4">{t('reset_password.error')}</p>
+          <Link to="/forgot-password" className="text-sage hover:text-sage-light font-medium hover:underline transition-colors">
+            {t('forgot_password.back_to_login')}
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[90vh] flex items-center justify-center bg-cream px-4 py-12">
@@ -31,11 +52,11 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <div className="w-16 h-16 rounded-2xl bg-forest/10 border border-forest/20 flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-sage" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
-          <h1 className="text-2xl font-heading font-black text-forest">{t('login.title')}</h1>
-          <p className="text-forest/60 mt-1">{t('login.subtitle')}</p>
+          <h1 className="text-2xl font-heading font-black text-forest">{t('reset_password.title')}</h1>
+          <p className="text-forest/60 mt-1">{t('reset_password.subtitle')}</p>
         </div>
 
         <div className="bg-white rounded-2xl border border-sage/10 p-8 shadow-sm">
@@ -47,24 +68,9 @@ export default function LoginPage() {
               {error}
             </div>
           )}
-
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-forest/80 mb-1.5">{t('login.email_label')}</label>
-              <div className="relative">
-                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-forest/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                <input
-                  type="email" required value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full bg-white border border-sage/20 rounded-xl pl-10 pr-4 py-2.5 text-forest focus:ring-2 focus:ring-sage focus:border-sage outline-none transition-all placeholder:text-forest/40"
-                  placeholder={t('login.email_placeholder')}
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-forest/80 mb-1.5">{t('login.password_label')}</label>
+              <label className="block text-sm font-medium text-forest/80 mb-1.5">{t('reset_password.password_label')}</label>
               <div className="relative">
                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-forest/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -73,14 +79,23 @@ export default function LoginPage() {
                   type="password" required value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   className="w-full bg-white border border-sage/20 rounded-xl pl-10 pr-4 py-2.5 text-forest focus:ring-2 focus:ring-sage focus:border-sage outline-none transition-all placeholder:text-forest/40"
-                  placeholder={t('login.password_placeholder')}
+                  placeholder={t('reset_password.password_placeholder')}
                 />
               </div>
             </div>
-            <div className="flex justify-end">
-              <Link to="/forgot-password" className="text-sm text-sage hover:text-sage-light font-medium hover:underline transition-colors">
-                {t('login.forgot_password')}
-              </Link>
+            <div>
+              <label className="block text-sm font-medium text-forest/80 mb-1.5">{t('reset_password.confirm_label')}</label>
+              <div className="relative">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-forest/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <input
+                  type="password" required value={form.password_confirmation}
+                  onChange={(e) => setForm({ ...form, password_confirmation: e.target.value })}
+                  className="w-full bg-white border border-sage/20 rounded-xl pl-10 pr-4 py-2.5 text-forest focus:ring-2 focus:ring-sage focus:border-sage outline-none transition-all placeholder:text-forest/40"
+                  placeholder={t('reset_password.confirm_placeholder')}
+                />
+              </div>
             </div>
             <button
               type="submit"
@@ -93,18 +108,11 @@ export default function LoginPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  {t('login.submit_loading')}
+                  {t('reset_password.submit_loading')}
                 </span>
-              ) : t('login.submit')}
+              ) : t('reset_password.submit')}
             </button>
           </form>
-
-          <p className="text-center text-sm text-forest/60 mt-6">
-            {t('login.prompt')}{' '}
-            <Link to="/register" className="text-sage hover:text-sage-light font-medium hover:underline transition-colors">
-              {t('login.prompt_link')}
-            </Link>
-          </p>
         </div>
       </div>
     </div>
