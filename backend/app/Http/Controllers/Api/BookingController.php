@@ -147,10 +147,10 @@ class BookingController extends Controller
         ];
 
         if ($validated['status'] === AppointmentStatus::Approved->value) {
-            if ($validated['appointment_date']) {
+            if (!empty($validated['appointment_date'])) {
                 $updateData['appointment_date'] = $validated['appointment_date'];
             }
-            if ($validated['start_time']) {
+            if (!empty($validated['start_time'])) {
                 $updateData['start_time'] = $validated['start_time'];
                 $updateData['end_time'] = Carbon::parse($validated['start_time'])->addMinutes(\App\Services\SlotService::SLOT_DURATION_MINUTES)->format('H:i');
             }

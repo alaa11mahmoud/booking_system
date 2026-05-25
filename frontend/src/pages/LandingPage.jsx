@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import api from '../lib/axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../contexts/AuthContext';
 import heroImg from '../assets/hero.png';
 import VideoPlayerModal from '../components/VideoPlayerModal';
 
@@ -176,6 +177,8 @@ function SocialIcon({ platform, className = 'w-5 h-5' }) {
 
 export default function LandingPage() {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
   const [about, setAbout] = useState(null);
   const [videos, setVideos] = useState([]);
@@ -244,15 +247,15 @@ export default function LandingPage() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Link
-                  to="/register"
+                <button
+                  onClick={() => navigate(user ? '/book' : '/login')}
                   className="inline-flex items-center gap-2 bg-white text-forest px-8 py-3.5 rounded-full font-semibold hover:bg-white/90 transition-all active:scale-95 shadow-lg"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   {t('landing.book_btn')}
-                </Link>
+                </button>
                 <Link
                   to="/login"
                   className="inline-flex items-center gap-2 border border-white/30 text-white px-8 py-3.5 rounded-full font-medium hover:bg-white/10 transition-all active:scale-95"

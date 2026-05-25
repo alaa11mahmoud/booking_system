@@ -48,8 +48,12 @@ export default function Navbar() {
             {navLinks.map(({ path, label }) => (
               <Link key={path} to={path} className={linkClass(path)}>{label}</Link>
             ))}
+            {user && user.role !== 'admin' && (
+              <Link to="/dashboard" className={linkClass('/dashboard')}>مواعيدي</Link>
+            )}
             {user?.role === 'admin' && (
               <>
+                <Link to="/admin" className={linkClass('/admin')}>لوحة الطبيب</Link>
                 <Link to="/admin/cms" className={linkClass('/admin/cms')}>صيانة المحتوى</Link>
                 <Link to="/admin/working-hours" className={linkClass('/admin/working-hours')}>أوقات العمل</Link>
               </>
@@ -120,17 +124,21 @@ export default function Navbar() {
                 <Link key={path} to={path} onClick={() => setMobileOpen(false)} className="px-4 py-2.5 rounded-xl text-forest/70 hover:text-forest hover:bg-forest/5 text-sm font-medium">{label}</Link>
               ))}
               <div className="border-t border-sage/10 pt-4 mt-2 space-y-2">
-                {user ? (
-                  <>
-                    {user.role === 'admin' && (
-                      <>
-                        <Link to="/admin/cms" onClick={() => setMobileOpen(false)} className="block px-4 py-2.5 rounded-xl text-forest/70 hover:text-forest hover:bg-forest/5 text-sm font-medium">صيانة المحتوى</Link>
-                        <Link to="/admin/working-hours" onClick={() => setMobileOpen(false)} className="block px-4 py-2.5 rounded-xl text-forest/70 hover:text-forest hover:bg-forest/5 text-sm font-medium">أوقات العمل</Link>
-                      </>
-                    )}
-                    <Link to={user.role === 'admin' ? '/admin' : '/dashboard'} onClick={() => setMobileOpen(false)} className="block px-4 py-2.5 rounded-xl bg-forest text-white text-sm font-semibold text-center">{t('nav.dashboard')}</Link>
-                    <button onClick={handleLogout} className="w-full px-4 py-2.5 rounded-xl border border-sage/30 text-forest/70 text-sm font-medium hover:bg-forest/5"> {t('nav.logout')}</button>
-                  </>
+                  {user ? (
+                    <>
+                      {user.role !== 'admin' && (
+                        <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="block px-4 py-2.5 rounded-xl text-forest/70 hover:text-forest hover:bg-forest/5 text-sm font-medium">مواعيدي</Link>
+                      )}
+                      {user.role === 'admin' && (
+                        <>
+                          <Link to="/admin" onClick={() => setMobileOpen(false)} className="block px-4 py-2.5 rounded-xl text-forest/70 hover:text-forest hover:bg-forest/5 text-sm font-medium">لوحة الطبيب</Link>
+                          <Link to="/admin/cms" onClick={() => setMobileOpen(false)} className="block px-4 py-2.5 rounded-xl text-forest/70 hover:text-forest hover:bg-forest/5 text-sm font-medium">صيانة المحتوى</Link>
+                          <Link to="/admin/working-hours" onClick={() => setMobileOpen(false)} className="block px-4 py-2.5 rounded-xl text-forest/70 hover:text-forest hover:bg-forest/5 text-sm font-medium">أوقات العمل</Link>
+                        </>
+                      )}
+                      <Link to={user.role === 'admin' ? '/admin' : '/dashboard'} onClick={() => setMobileOpen(false)} className="block px-4 py-2.5 rounded-xl bg-forest text-white text-sm font-semibold text-center">{t('nav.dashboard')}</Link>
+                      <button onClick={handleLogout} className="w-full px-4 py-2.5 rounded-xl border border-sage/30 text-forest/70 text-sm font-medium hover:bg-forest/5"> {t('nav.logout')}</button>
+                    </>                      
                 ) : (
                   <>
                     <Link to="/login" onClick={() => setMobileOpen(false)} className="block px-4 py-2.5 rounded-xl border border-sage/30 text-forest/70 text-sm font-medium text-center hover:bg-forest/5">{t('nav.login')}</Link>

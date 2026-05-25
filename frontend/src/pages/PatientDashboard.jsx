@@ -28,14 +28,27 @@ export default function PatientDashboard() {
   const { user } = useAuth();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('all');
   const { unreadCount = 0 } = useNotifications() || {};
 
-  useEffect(() => {
-    api.get('/bookings').then((r) => {
-      const data = r.data.data ?? r.data;
+  const fetch = (statusFilter) => {
+    setLoading(true);
+    const statusParam = statusFilter && statusFilter !== 'all' && statusFilter !== 'upcoming' ? { status: statusFilter } : {};
+    api.get('/bookings', { params: statusParam }).then((r) => {
+      let data = r.data.data ?? r.data;
+      if (statusFilter === 'upcoming') {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        data = (Array.isArray(data) ? data : []).filter((apt) => {
+          const aptDate = new Date(apt.appointment_date + 'T12:00:00');
+          return apt.status === 'approved' && aptDate >= today;
+        });
+      }
       setAppointments(Array.isArray(data) ? data : []);
     }).catch(() => {}).finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => { fetch(filter); }, [filter]);
 
   const statusIconStyle = (status) => {
     switch (status) {
@@ -72,6 +85,43 @@ export default function PatientDashboard() {
           </div>
         </div>
 
+        <div className="flex gap-2 mb-6 flex-wrap justify-between">
+          <div className="flex gap-2 flex-wrap">
+            <button
+              onClick={() => setFilter('all')}
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                filter === 'all' ? 'bg-forest text-white shadow-sm' : 'bg-white text-forest/60 border border-sage/10 hover:bg-forest/5'
+              }`}
+            >
+              {t('admin_dashboard.filter_all')}
+            </button>
+            <button
+              onClick={() => setFilter('approved')}
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                filter === 'approved' ? 'bg-forest text-white shadow-sm' : 'bg-white text-forest/60 border border-sage/10 hover:bg-forest/5'
+              }`}
+            >
+              {t('admin_dashboard.filter_accepted')}
+            </button>
+            <button
+              onClick={() => setFilter('rejected')}
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                filter === 'rejected' ? 'bg-forest text-white shadow-sm' : 'bg-white text-forest/60 border border-sage/10 hover:bg-forest/5'
+              }`}
+            >
+              {t('admin_dashboard.filter_rejected')}
+            </button>
+          </div>
+          <button
+            onClick={() => setFilter('upcoming')}
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+              filter === 'upcoming' ? 'bg-forest text-white shadow-sm' : 'bg-white text-forest/60 border border-sage/10 hover:bg-forest/5'
+            }`}
+          >
+            {t('patient_dashboard.filter_upcoming')}
+          </button>
+        </div>
+
         {appointments.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-sage/10 animate-fade-in">
             <svg className="w-16 h-16 text-forest/30 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,8 +156,10 @@ export default function PatientDashboard() {
                         </svg>
                         {apt.start_time?.substring(0, 5)} - {apt.end_time?.substring(0, 5)}
                       </p>
-                      {apt.patient_notes && (
-                        <p className="text-sm text-forest/60 italic mt-2 bg-warm rounded-lg px-3 py-2">"{apt.patient_notes}"</p>
+                      {apt.cancellation_reason && (
+                        <p className="text-sm text-sage mt-2 bg-sage/5 rounded-lg px-3 py-2 border border-sage/10">
+                          <span className="font-semibold">د. هالة: </span>{apt.cancellation_reason}
+                        </p>
                       )}
                     </div>
                   </div>

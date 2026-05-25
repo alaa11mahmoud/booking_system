@@ -86,6 +86,7 @@
   "booking.submit": "احجز الموعد",
   "booking.success": "تم حجز الموعد بنجاح!",
   "booking.failed": "فشل الحجز",
+  "patient_dashboard.filter_upcoming": "مواعيد لم تتم بعد",
   "patient_dashboard.title": "مواعيدي",
   "patient_dashboard.greeting": "مرحباً بعودتك، {{name}}",
   "patient_dashboard.new_notification": "{{count}} إشعار جديد",
