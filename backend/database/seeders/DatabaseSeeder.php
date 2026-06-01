@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Enums\UserRole;
 use App\Models\Certification;
 use App\Models\CmsAbout;
-use App\Models\Course;
 use App\Models\Patient;
 use App\Models\Post;
 use App\Models\SocialLink;
@@ -57,30 +56,6 @@ class DatabaseSeeder extends Seeder
             'title' => 'About Dr. Halla',
             'content' => 'Dr. Halla is a licensed clinical psychologist with over 15 years of experience in providing compassionate mental health care. Specializing in anxiety, depression, and family counseling, Dr. Halla is dedicated to helping patients achieve emotional well-being through evidence-based therapeutic approaches.',
             'image_url' => '/images/dr-halla.jpg',
-            'is_active' => true,
-        ]);
-
-        Course::create([
-            'title' => 'Stress Management Fundamentals',
-            'description' => 'Learn practical techniques to manage daily stress and build resilience. This course covers mindfulness, breathing exercises, and cognitive reframing.',
-            'price' => 49.99,
-            'sort_order' => 1,
-            'is_active' => true,
-        ]);
-
-        Course::create([
-            'title' => 'Mindfulness Meditation',
-            'description' => 'A guided journey into mindfulness practices. Includes weekly sessions, meditation recordings, and personalized feedback.',
-            'price' => 79.99,
-            'sort_order' => 2,
-            'is_active' => true,
-        ]);
-
-        Course::create([
-            'title' => 'Anxiety Relief Program',
-            'description' => 'A comprehensive 8-week program designed to help you understand and manage anxiety through CBT techniques and support.',
-            'price' => 149.99,
-            'sort_order' => 3,
             'is_active' => true,
         ]);
 

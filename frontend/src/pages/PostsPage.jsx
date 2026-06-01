@@ -27,14 +27,6 @@ function CoinIcon({ className = 'w-5 h-5' }) {
   );
 }
 
-function HeartIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-    </svg>
-  );
-}
-
 export default function PostsPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -118,7 +110,7 @@ export default function PostsPage() {
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-10">
           <div className="w-16 h-16 rounded-2xl bg-forest/10 border border-forest/20 flex items-center justify-center mx-auto mb-4">
-            <HeartIcon />
+            <img src="/logo-new.png" alt="د. هالة" className="h-8 w-auto" />
           </div>
           <h1 className="text-3xl md:text-4xl font-heading font-black text-forest">منشورات د. هالة</h1>
           <p className="text-forest/60 mt-2">جلسات وبرامج وفعاليات</p>

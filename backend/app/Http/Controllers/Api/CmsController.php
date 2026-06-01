@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Certification;
 use App\Models\CmsAbout;
-use App\Models\Course;
 use App\Models\Faq;
 use App\Models\Post;
 use App\Models\PostSubscription;
@@ -31,17 +30,6 @@ class CmsController extends Controller
         });
 
         return response()->json($about);
-    }
-
-    public function courses(): JsonResponse
-    {
-        $courses = Cache::remember('cms_courses', 3600, function () {
-            return Course::where('is_active', true)
-                ->orderBy('sort_order')
-                ->get();
-        });
-
-        return response()->json($courses);
     }
 
     public function videos(): JsonResponse

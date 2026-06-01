@@ -29,6 +29,10 @@ Route::get('/logo.png', function () {
     return response()->file(base_path('../frontend/dist/logo.png'));
 });
 
+Route::get('/logo-new.png', function () {
+    return response()->file(base_path('../frontend/dist/logo-new.png'));
+});
+
 Route::get('/{any?}', function () {
     $indexFile = base_path('../frontend/dist/index.html');
     if (!file_exists($indexFile)) {

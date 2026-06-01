@@ -6,13 +6,10 @@ export default function AdminCMS() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('about');
   const [about, setAbout] = useState({ title: '', content: '', image_url: '' });
-  const [courses, setCourses] = useState([]);
   const [videos, setVideos] = useState([]);
   const [certifications, setCertifications] = useState([]);
   const [posts, setPosts] = useState([]);
-  const [socialLinks, setSocialLinks] = useState([]);
-  const [testimonials, setTestimonials] = useState([]);
-  const [faqs, setFaqs] = useState([]);
+  
   const [newPost, setNewPost] = useState({ title: '', content: '', start_date: '', end_date: '', start_time: '', end_time: '', price: '', max_members: '', image_url: '' });
   const [msg, setMsg] = useState('');
   const [msgType, setMsgType] = useState('success');
@@ -36,13 +33,9 @@ export default function AdminCMS() {
         setInitialAbout(d);
       }
     }).catch(() => {});
-    api.get('/cms/courses').then((r) => setCourses(Array.isArray(r.data) ? r.data : [])).catch(() => {});
     api.get('/cms/videos').then((r) => setVideos(Array.isArray(r.data) ? r.data : [])).catch(() => {});
     api.get('/cms/certifications').then((r) => setCertifications(Array.isArray(r.data) ? r.data : [])).catch(() => {});
     api.get('/cms/posts').then((r) => setPosts(Array.isArray(r.data) ? r.data : [])).catch(() => {});
-    api.get('/cms/social-links').then((r) => setSocialLinks(Array.isArray(r.data) ? r.data : [])).catch(() => {});
-    api.get('/cms/testimonials').then((r) => setTestimonials(Array.isArray(r.data) ? r.data : [])).catch(() => {});
-    api.get('/cms/faqs').then((r) => setFaqs(Array.isArray(r.data) ? r.data : [])).catch(() => {});
   }, []);
 
   const switchTab = (tab) => {
@@ -63,40 +56,7 @@ export default function AdminCMS() {
     } finally { setSaving(false); }
   };
 
-  const addCourse = async () => {
-    try {
-      const res = await api.post('/cms/courses', { title: 'New Course', description: '', price: 0, sort_order: courses.length + 1 });
-      setCourses([...courses, res.data]);
-      setMsg(t('admin_cms.success_course_added')); setMsgType('success');
-    } catch (err) { setMsg(err.response?.data?.message || t('admin_cms.failed')); setMsgType('error'); }
-  };
-
   const [savingId, setSavingId] = useState(null);
-
-  const updateCourse = async (id, data) => {
-    setSavingId(id);
-    try {
-      const res = await api.put(`/cms/courses/${id}`, data);
-      setCourses(courses.map((c) => c.id === id ? res.data : c));
-      setDirtyIds((prev) => { const n = new Set(prev); n.delete(id); return n; });
-      setMsg(t('admin_cms.success_course_updated')); setMsgType('success');
-    } catch (err) { setMsg(err.response?.data?.message || t('admin_cms.failed')); setMsgType('error'); }
-    finally { setSavingId(null); }
-  };
-
-  const setCourseField = (id, field, value) => {
-    setCourses(courses.map((c) => c.id === id ? { ...c, [field]: value } : c));
-    setDirtyIds((prev) => { const n = new Set(prev); n.add(id); return n; });
-  };
-
-  const deleteCourse = async (id) => {
-    try {
-      await api.delete(`/cms/courses/${id}`);
-      setCourses(courses.filter((c) => c.id !== id));
-      setDirtyIds((prev) => { const n = new Set(prev); n.delete(id); return n; });
-      setMsg(t('admin_cms.success_course_deleted')); setMsgType('success');
-    } catch (err) { setMsg(err.response?.data?.message || t('admin_cms.failed')); setMsgType('error'); }
-  };
 
   const addVideo = async () => {
     try {
@@ -230,10 +190,7 @@ const today = new Date().toISOString().substring(0, 10);
       <div className="max-w-5xl mx-auto animate-slide-up">
         <div className="text-center mb-10">
           <div className="w-16 h-16 rounded-2xl bg-forest/10 border border-forest/20 flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-sage" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
+            <img src="/logo-new.png" alt="د. هالة" className="h-8 w-auto" />
           </div>
           <h1 className="text-3xl md:text-4xl font-heading font-black text-forest">{t('admin_cms.title')}</h1>
           <p className="text-forest/60 mt-2">{t('admin_cms.subtitle')}</p>
@@ -241,13 +198,9 @@ const today = new Date().toISOString().substring(0, 10);
 
         <div className="flex gap-2 mb-8 justify-center flex-wrap">
           <TabButton tab="about">{t('admin_cms.tab_about')}</TabButton>
-          <TabButton tab="courses">{t('admin_cms.tab_courses')}</TabButton>
           <TabButton tab="videos">{t('admin_cms.tab_videos')}</TabButton>
           <TabButton tab="certifications">{t('admin_cms.tab_certifications')}</TabButton>
           <TabButton tab="posts">المنشورات</TabButton>
-          <TabButton tab="social">روابط التواصل</TabButton>
-          <TabButton tab="testimonials">آراء العملاء</TabButton>
-          <TabButton tab="faqs">الأسئلة الشائعة</TabButton>
         </div>
 
         {msg && (
@@ -297,67 +250,6 @@ const today = new Date().toISOString().substring(0, 10);
               <button onClick={saveAbout} disabled={saving || !isAboutDirty} className={btnClass + (isAboutDirty ? '' : ' opacity-50 cursor-not-allowed')}>
                 {saving ? t('admin_cms.save_loading') : t('admin_cms.save_about')}
               </button>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'courses' && (
-          <div className="animate-fade-in">
-            <button onClick={addCourse} className="mb-5 bg-forest text-white px-5 py-2.5 rounded-xl hover:bg-forest-light transition-all font-semibold shadow-md hover:shadow-forest/25 active:scale-[0.98] text-sm flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              {t('admin_cms.add_course')}
-            </button>
-            <div className="space-y-4">
-              {courses.map((course) => (
-                <div key={course.id} className="bg-white rounded-2xl border border-sage/10 shadow-sm p-5 card-hover">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="md:col-span-2">
-                      <input value={course.title} onChange={(e) => setCourseField(course.id, 'title', e.target.value)}
-                        className={inputClass} placeholder={t('admin_cms.course_title_placeholder')} />
-                    </div>
-                    <div className="md:col-span-2">
-                      <textarea value={course.description || ''} onChange={(e) => setCourseField(course.id, 'description', e.target.value)}
-                        className={inputClass + ' resize-none'} rows={2} placeholder={t('admin_cms.description_placeholder')} />
-                    </div>
-                    <input value={course.price} onChange={(e) => setCourseField(course.id, 'price', parseFloat(e.target.value) || 0)}
-                      type="number" step="0.01" className={inputClass} placeholder={t('admin_cms.price_placeholder')} />
-                    <div className="flex items-center gap-2">
-                      <input value={course.image_url || ''} onChange={(e) => setCourseField(course.id, 'image_url', e.target.value)}
-                        className={inputClass + ' flex-1'} placeholder={t('admin_cms.image_url_placeholder')} />
-                      <label className="cursor-pointer bg-warm hover:bg-sage/10 text-forest/70 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors border border-sage/20 whitespace-nowrap self-start">
-                        {t('admin_cms.upload_image')}
-                        <input type="file" accept="image/*" className="hidden" onChange={(e) => {
-                          const file = e.target.files[0];
-                          if (!file) return;
-                          const fd = new FormData();
-                          fd.append('file', file);
-                          api.post('/upload', fd).then((res) => {
-                            setCourseField(course.id, 'image_url', res.data.url);
-                          }).catch((err) => setMsg(err.response?.data?.message || t('admin_cms.failed')));
-                          e.target.value = '';
-                        }} />
-                      </label>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <label className="flex items-center gap-2 text-sm cursor-pointer">
-                        <div className={`relative w-9 h-4.5 rounded-full transition-colors ${course.is_active ? 'bg-forest' : 'bg-forest/20'}`}>
-                          <input type="checkbox" checked={course.is_active} onChange={(e) => setCourseField(course.id, 'is_active', e.target.checked)} className="sr-only" />
-                          <div className={`absolute top-0.5 left-0.5 w-3.5 h-3.5 bg-white rounded-full shadow-sm transition-transform ${course.is_active ? 'translate-x-4.5' : ''}`} />
-                        </div>
-                        <span className="text-forest/50">Active</span>
-                      </label>
-                      <button onClick={() => updateCourse(course.id, course)} disabled={savingId === course.id || !dirtyIds.has(course.id)} className={'bg-forest text-white px-4 py-2 rounded-xl hover:bg-forest-light transition-all font-semibold shadow-md text-sm' + (dirtyIds.has(course.id) ? '' : ' opacity-50 cursor-not-allowed')}>
-                        {savingId === course.id ? t('admin_cms.save_loading') : t('admin_cms.save')}
-                      </button>
-                      <button onClick={() => deleteCourse(course.id)} className="text-red-400 hover:text-red-300 text-sm font-medium hover:underline transition-colors ml-auto">
-                        {t('admin_cms.delete')}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         )}
@@ -558,228 +450,6 @@ const today = new Date().toISOString().substring(0, 10);
                         حذف
                       </button>
                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'social' && (
-          <div className="animate-fade-in">
-            <button onClick={async () => {
-              try {
-                const res = await api.post('/cms/social-links', { platform: 'whatsapp', label: 'رابط جديد', url: 'https://', sort_order: socialLinks.length + 1 });
-                setSocialLinks([...socialLinks, res.data]);
-                setMsg('تمت إضافة الرابط'); setMsgType('success');
-              } catch (err) { setMsg(err.response?.data?.message || 'فشل الإضافة'); setMsgType('error'); }
-            }} className="mb-5 bg-forest text-white px-5 py-2.5 rounded-xl hover:bg-forest-light transition-all font-semibold shadow-md hover:shadow-forest/25 active:scale-[0.98] text-sm flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              إضافة رابط
-            </button>
-            <div className="space-y-4">
-              {socialLinks.map((link) => (
-                <div key={link.id} className="bg-white rounded-2xl border border-sage/10 shadow-sm p-5 card-hover">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <select value={link.platform} onChange={(e) => {
-                      setSocialLinks(socialLinks.map((l) => l.id === link.id ? { ...l, platform: e.target.value } : l));
-                      setDirtyIds((prev) => { const n = new Set(prev); n.add(link.id); return n; });
-                    }} className="w-full bg-white border border-sage/20 rounded-xl px-4 py-2.5 text-forest focus:ring-2 focus:ring-sage focus:border-sage outline-none transition-all">
-                      <option value="whatsapp">واتساب</option>
-                      <option value="facebook">فيسبوك</option>
-                      <option value="telegram">تيليجرام</option>
-                      <option value="instagram">انستغرام</option>
-                      <option value="youtube">يوتيوب</option>
-                      <option value="twitter">تويتر</option>
-                      <option value="other">أخرى</option>
-                    </select>
-                    <input value={link.label} onChange={(e) => {
-                      setSocialLinks(socialLinks.map((l) => l.id === link.id ? { ...l, label: e.target.value } : l));
-                      setDirtyIds((prev) => { const n = new Set(prev); n.add(link.id); return n; });
-                    }} className="w-full bg-white border border-sage/20 rounded-xl px-4 py-2.5 text-forest focus:ring-2 focus:ring-sage focus:border-sage outline-none transition-all" placeholder="النص" />
-                    <input value={link.url} onChange={(e) => {
-                      setSocialLinks(socialLinks.map((l) => l.id === link.id ? { ...l, url: e.target.value } : l));
-                      setDirtyIds((prev) => { const n = new Set(prev); n.add(link.id); return n; });
-                    }} className="w-full bg-white border border-sage/20 rounded-xl px-4 py-2.5 text-forest focus:ring-2 focus:ring-sage focus:border-sage outline-none transition-all" placeholder="https://..." />
-                  </div>
-                  <div className="flex items-center gap-4 mt-4">
-                    <label className="flex items-center gap-2 text-sm cursor-pointer">
-                      <div className={`relative w-9 h-4.5 rounded-full transition-colors ${link.is_active ? 'bg-forest' : 'bg-forest/20'}`}>
-                        <input type="checkbox" checked={link.is_active} onChange={(e) => {
-                          setSocialLinks(socialLinks.map((l) => l.id === link.id ? { ...l, is_active: e.target.checked } : l));
-                          setDirtyIds((prev) => { const n = new Set(prev); n.add(link.id); return n; });
-                        }} className="sr-only" />
-                        <div className={`absolute top-0.5 left-0.5 w-3.5 h-3.5 bg-white rounded-full shadow-sm transition-transform ${link.is_active ? 'translate-x-4.5' : ''}`} />
-                      </div>
-                      <span className="text-forest/50">نشط</span>
-                    </label>
-                    <button onClick={async () => {
-                      setSavingId(link.id);
-                      try {
-                        const res = await api.put(`/cms/social-links/${link.id}`, link);
-                        setSocialLinks(socialLinks.map((l) => l.id === link.id ? res.data : l));
-                        setDirtyIds((prev) => { const n = new Set(prev); n.delete(link.id); return n; });
-                        setMsg('تم تحديث الرابط'); setMsgType('success');
-                      } catch (err) { setMsg(err.response?.data?.message || 'فشل التحديث'); setMsgType('error'); }
-                      finally { setSavingId(null); }
-                    }} disabled={savingId === link.id || !dirtyIds.has(link.id)}
-                      className={'bg-forest text-white px-4 py-2 rounded-xl hover:bg-forest-light transition-all font-semibold shadow-md text-sm' + (dirtyIds.has(link.id) ? '' : ' opacity-50 cursor-not-allowed')}>
-                      {savingId === link.id ? 'جارٍ الحفظ...' : 'حفظ'}
-                    </button>
-                    <button onClick={async () => {
-                      try {
-                        await api.delete(`/cms/social-links/${link.id}`);
-                        setSocialLinks(socialLinks.filter((l) => l.id !== link.id));
-                        setDirtyIds((prev) => { const n = new Set(prev); n.delete(link.id); return n; });
-                        setMsg('تم حذف الرابط'); setMsgType('success');
-                      } catch (err) { setMsg(err.response?.data?.message || 'فشل الحذف'); setMsgType('error'); }
-                    }} className="text-red-400 hover:text-red-300 text-sm font-medium hover:underline transition-colors ml-auto">
-                      حذف
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'testimonials' && (
-          <div className="animate-fade-in">
-            <button onClick={async () => {
-              try {
-                const res = await api.post('/cms/testimonials', { name: 'عميل جديد', review: 'نص التقييم', sort_order: testimonials.length + 1 });
-                setTestimonials([...testimonials, res.data]);
-                setMsg('تمت إضافة التقييم'); setMsgType('success');
-              } catch (err) { setMsg(err.response?.data?.message || 'فشل الإضافة'); setMsgType('error'); }
-            }} className="mb-5 bg-forest text-white px-5 py-2.5 rounded-xl hover:bg-forest-light transition-all font-semibold shadow-md hover:shadow-forest/25 active:scale-[0.98] text-sm flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              إضافة تقييم
-            </button>
-            <div className="space-y-4">
-              {testimonials.map((item) => (
-                <div key={item.id} className="bg-white rounded-2xl border border-sage/10 shadow-sm p-5 card-hover">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input value={item.name} onChange={(e) => {
-                      setTestimonials(testimonials.map((t) => t.id === item.id ? { ...t, name: e.target.value } : t));
-                      setDirtyIds((prev) => { const n = new Set(prev); n.add(item.id); return n; });
-                    }} className={inputClass} placeholder="الاسم" />
-                    <input value={item.role || ''} onChange={(e) => {
-                      setTestimonials(testimonials.map((t) => t.id === item.id ? { ...t, role: e.target.value } : t));
-                      setDirtyIds((prev) => { const n = new Set(prev); n.add(item.id); return n; });
-                    }} className={inputClass} placeholder="الدور (اختياري)" />
-                    <div className="md:col-span-2">
-                      <textarea value={item.review} onChange={(e) => {
-                        setTestimonials(testimonials.map((t) => t.id === item.id ? { ...t, review: e.target.value } : t));
-                        setDirtyIds((prev) => { const n = new Set(prev); n.add(item.id); return n; });
-                      }} className={inputClass + ' resize-none'} rows={3} placeholder="نص التقييم" />
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 mt-4">
-                    <label className="flex items-center gap-2 text-sm cursor-pointer">
-                      <div className={`relative w-9 h-4.5 rounded-full transition-colors ${item.is_active ? 'bg-forest' : 'bg-forest/20'}`}>
-                        <input type="checkbox" checked={item.is_active} onChange={(e) => {
-                          setTestimonials(testimonials.map((t) => t.id === item.id ? { ...t, is_active: e.target.checked } : t));
-                          setDirtyIds((prev) => { const n = new Set(prev); n.add(item.id); return n; });
-                        }} className="sr-only" />
-                        <div className={`absolute top-0.5 left-0.5 w-3.5 h-3.5 bg-white rounded-full shadow-sm transition-transform ${item.is_active ? 'translate-x-4.5' : ''}`} />
-                      </div>
-                      <span className="text-forest/50">نشط</span>
-                    </label>
-                    <button onClick={async () => {
-                      setSavingId(item.id);
-                      try {
-                        const res = await api.put(`/cms/testimonials/${item.id}`, item);
-                        setTestimonials(testimonials.map((t) => t.id === item.id ? res.data : t));
-                        setDirtyIds((prev) => { const n = new Set(prev); n.delete(item.id); return n; });
-                        setMsg('تم تحديث التقييم'); setMsgType('success');
-                      } catch (err) { setMsg(err.response?.data?.message || 'فشل التحديث'); setMsgType('error'); }
-                      finally { setSavingId(null); }
-                    }} disabled={savingId === item.id || !dirtyIds.has(item.id)}
-                      className={'bg-forest text-white px-4 py-2 rounded-xl hover:bg-forest-light transition-all font-semibold shadow-md text-sm' + (dirtyIds.has(item.id) ? '' : ' opacity-50 cursor-not-allowed')}>
-                      {savingId === item.id ? 'جارٍ الحفظ...' : 'حفظ'}
-                    </button>
-                    <button onClick={async () => {
-                      try {
-                        await api.delete(`/cms/testimonials/${item.id}`);
-                        setTestimonials(testimonials.filter((t) => t.id !== item.id));
-                        setDirtyIds((prev) => { const n = new Set(prev); n.delete(item.id); return n; });
-                        setMsg('تم حذف التقييم'); setMsgType('success');
-                      } catch (err) { setMsg(err.response?.data?.message || 'فشل الحذف'); setMsgType('error'); }
-                    }} className="text-red-400 hover:text-red-300 text-sm font-medium hover:underline transition-colors ml-auto">
-                      حذف
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'faqs' && (
-          <div className="animate-fade-in">
-            <button onClick={async () => {
-              try {
-                const res = await api.post('/cms/faqs', { question: 'سؤال جديد', answer: 'الإجابة', sort_order: faqs.length + 1 });
-                setFaqs([...faqs, res.data]);
-                setMsg('تمت إضافة السؤال'); setMsgType('success');
-              } catch (err) { setMsg(err.response?.data?.message || 'فشل الإضافة'); setMsgType('error'); }
-            }} className="mb-5 bg-forest text-white px-5 py-2.5 rounded-xl hover:bg-forest-light transition-all font-semibold shadow-md hover:shadow-forest/25 active:scale-[0.98] text-sm flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              إضافة سؤال
-            </button>
-            <div className="space-y-4">
-              {faqs.map((item) => (
-                <div key={item.id} className="bg-white rounded-2xl border border-sage/10 shadow-sm p-5 card-hover">
-                  <div className="space-y-4">
-                    <input value={item.question} onChange={(e) => {
-                      setFaqs(faqs.map((f) => f.id === item.id ? { ...f, question: e.target.value } : f));
-                      setDirtyIds((prev) => { const n = new Set(prev); n.add(item.id); return n; });
-                    }} className={inputClass} placeholder="السؤال" />
-                    <textarea value={item.answer} onChange={(e) => {
-                      setFaqs(faqs.map((f) => f.id === item.id ? { ...f, answer: e.target.value } : f));
-                      setDirtyIds((prev) => { const n = new Set(prev); n.add(item.id); return n; });
-                    }} className={inputClass + ' resize-none'} rows={3} placeholder="الإجابة" />
-                  </div>
-                  <div className="flex items-center gap-4 mt-4">
-                    <label className="flex items-center gap-2 text-sm cursor-pointer">
-                      <div className={`relative w-9 h-4.5 rounded-full transition-colors ${item.is_active ? 'bg-forest' : 'bg-forest/20'}`}>
-                        <input type="checkbox" checked={item.is_active} onChange={(e) => {
-                          setFaqs(faqs.map((f) => f.id === item.id ? { ...f, is_active: e.target.checked } : f));
-                          setDirtyIds((prev) => { const n = new Set(prev); n.add(item.id); return n; });
-                        }} className="sr-only" />
-                        <div className={`absolute top-0.5 left-0.5 w-3.5 h-3.5 bg-white rounded-full shadow-sm transition-transform ${item.is_active ? 'translate-x-4.5' : ''}`} />
-                      </div>
-                      <span className="text-forest/50">نشط</span>
-                    </label>
-                    <button onClick={async () => {
-                      setSavingId(item.id);
-                      try {
-                        const res = await api.put(`/cms/faqs/${item.id}`, item);
-                        setFaqs(faqs.map((f) => f.id === item.id ? res.data : f));
-                        setDirtyIds((prev) => { const n = new Set(prev); n.delete(item.id); return n; });
-                        setMsg('تم تحديث السؤال'); setMsgType('success');
-                      } catch (err) { setMsg(err.response?.data?.message || 'فشل التحديث'); setMsgType('error'); }
-                      finally { setSavingId(null); }
-                    }} disabled={savingId === item.id || !dirtyIds.has(item.id)}
-                      className={'bg-forest text-white px-4 py-2 rounded-xl hover:bg-forest-light transition-all font-semibold shadow-md text-sm' + (dirtyIds.has(item.id) ? '' : ' opacity-50 cursor-not-allowed')}>
-                      {savingId === item.id ? 'جارٍ الحفظ...' : 'حفظ'}
-                    </button>
-                    <button onClick={async () => {
-                      try {
-                        await api.delete(`/cms/faqs/${item.id}`);
-                        setFaqs(faqs.filter((f) => f.id !== item.id));
-                        setDirtyIds((prev) => { const n = new Set(prev); n.delete(item.id); return n; });
-                        setMsg('تم حذف السؤال'); setMsgType('success');
-                      } catch (err) { setMsg(err.response?.data?.message || 'فشل الحذف'); setMsgType('error'); }
-                    }} className="text-red-400 hover:text-red-300 text-sm font-medium hover:underline transition-colors ml-auto">
-                      حذف
-                    </button>
                   </div>
                 </div>
               ))}

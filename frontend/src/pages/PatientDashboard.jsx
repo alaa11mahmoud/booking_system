@@ -124,9 +124,7 @@ export default function PatientDashboard() {
 
         {appointments.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-sage/10 animate-fade-in">
-            <svg className="w-16 h-16 text-forest/30 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+            <img src="/logo-new.png" alt="د. هالة" className="w-16 h-auto mx-auto mb-4 opacity-50" />
             <p className="text-forest/60 text-lg mb-2">{t('patient_dashboard.no_appointments')}</p>
             <Link to="/book" className="inline-flex items-center gap-2 bg-forest text-white px-6 py-2.5 rounded-xl font-medium hover:bg-forest-light transition-all hover:shadow-lg active:scale-95">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

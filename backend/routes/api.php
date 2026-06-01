@@ -38,9 +38,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/working-hours', [WorkingHourController::class, 'update']);
 
     Route::put('/cms/about', [AdminCmsController::class, 'updateAbout']);
-    Route::post('/cms/courses', [AdminCmsController::class, 'storeCourse']);
-    Route::put('/cms/courses/{course}', [AdminCmsController::class, 'updateCourse']);
-    Route::delete('/cms/courses/{course}', [AdminCmsController::class, 'deleteCourse']);
     Route::post('/cms/videos', [AdminCmsController::class, 'storeVideo']);
     Route::put('/cms/videos/{video}', [AdminCmsController::class, 'updateVideo']);
     Route::delete('/cms/videos/{video}', [AdminCmsController::class, 'deleteVideo']);
@@ -67,7 +64,6 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::get('/cms/about', [CmsController::class, 'about']);
-Route::get('/cms/courses', [CmsController::class, 'courses']);
 Route::get('/cms/videos', [CmsController::class, 'videos']);
 Route::get('/cms/certifications', [CmsController::class, 'certifications']);
 Route::get('/cms/posts', [CmsController::class, 'posts']);

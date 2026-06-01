@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Certification;
 use App\Models\CmsAbout;
-use App\Models\Course;
 use App\Models\Faq;
 use App\Models\Post;
 use App\Models\SocialLink;
@@ -13,6 +12,7 @@ use App\Models\Testimonial;
 use App\Models\Video;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -44,51 +44,9 @@ class AdminCmsController extends Controller
             'is_active' => true,
         ]);
 
+        Cache::forget('cms_about');
+
         return response()->json($about);
-    }
-
-    public function storeCourse(Request $request): JsonResponse
-    {
-        if (!$request->user()->isAdmin()) {
-            return response()->json(['message' => __('messages.forbidden')], 403);
-        }
-
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'image_url' => 'nullable|string|max:255',
-            'sort_order' => 'nullable|integer',
-        ]);
-
-        $course = Course::create($validated);
-
-        return response()->json($course, 201);
-    }
-
-    public function updateCourse(Request $request, Course $course): JsonResponse
-    {
-        if (!$request->user()->isAdmin()) {
-            return response()->json(['message' => __('messages.forbidden')], 403);
-        }
-
-        $validated = $request->validate([
-            'title' => 'string|max:255',
-            'description' => 'nullable|string',
-            'content' => 'string',
-            'session_date' => 'required|date',
-            'start_time' => 'required|date_format:H:i',
-            'session_time' => 'nullable|integer|min:1',
-            'price' => 'nullable|numeric|min:0',
-            'max_members' => 'required|integer|min:1',
-            'image_url' => 'nullable|string|max:255',
-            'sort_order' => 'nullable|integer',
-            'is_active' => 'boolean',
-        ]);
-
-        $course->update($validated);
-
-        return response()->json($course);
     }
 
     public function storeVideo(Request $request): JsonResponse
@@ -130,12 +88,6 @@ class AdminCmsController extends Controller
         $video->update($validated);
 
         return response()->json($video);
-    }
-
-    public function deleteCourse(Course $course): JsonResponse
-    {
-        $course->delete();
-        return response()->json(['message' => __('messages.course_deleted')]);
     }
 
     public function deleteVideo(Video $video): JsonResponse
