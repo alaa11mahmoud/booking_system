@@ -550,7 +550,7 @@ export default function LandingPage() {
                   <span className="text-3xl font-bold text-forest">
                     {sub.price} <span className="text-base font-normal text-forest/50">{sub.currency}</span>
                   </span>
-                  <button className="px-5 py-2.5 rounded-full bg-forest text-white text-sm font-semibold hover:bg-forest-light transition-all active:scale-95 shadow-sm">
+                  <button onClick={() => navigate('/book')} className="px-5 py-2.5 rounded-full bg-forest text-white text-sm font-semibold hover:bg-forest-light transition-all active:scale-95 shadow-sm">
                     {t('landing.subscribe')}
                   </button>
                 </div>
