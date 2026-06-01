@@ -61,6 +61,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/cms/faqs', [AdminCmsController::class, 'storeFaq']);
     Route::put('/cms/faqs/{faq}', [AdminCmsController::class, 'updateFaq']);
     Route::delete('/cms/faqs/{faq}', [AdminCmsController::class, 'deleteFaq']);
+
+    Route::get('/admin/posts', [AdminCmsController::class, 'allPosts']);
+    Route::get('/admin/posts/{post}/subscribers', [PostSubscriptionController::class, 'subscribers']);
 });
 
 Route::get('/cms/about', [CmsController::class, 'about']);

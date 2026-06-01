@@ -286,6 +286,25 @@ class AdminCmsController extends Controller
         return response()->json(['message' => 'تم حذف الرابط']);
     }
 
+    public function allPosts(Request $request): JsonResponse
+    {
+        if (!$request->user()->isAdmin()) {
+            return response()->json(['message' => __('messages.forbidden')], 403);
+        }
+
+        $posts = Post::withCount('subscriptions')
+            ->orderBy('sort_order')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->each(function ($post) {
+                $post->available_spots = $post->max_members
+                    ? $post->max_members - $post->subscriptions_count
+                    : null;
+            });
+
+        return response()->json($posts);
+    }
+
     public function storePost(Request $request): JsonResponse
     {
         if (!$request->user()->isAdmin()) {

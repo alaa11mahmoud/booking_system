@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Enums\UserRole;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class PostSubscriptionController extends Controller
 {
@@ -78,6 +79,20 @@ class PostSubscriptionController extends Controller
         }
 
         return response()->json($subscription->load('post', 'patient.user'), 201);
+    }
+
+    public function subscribers(Request $request, Post $post): JsonResponse
+    {
+        if (!$request->user()->isAdmin()) {
+            return response()->json(['message' => __('messages.forbidden')], 403);
+        }
+
+        $subscriptions = PostSubscription::with('patient.user')
+            ->where('post_id', $post->id)
+            ->latest()
+            ->get();
+
+        return response()->json($subscriptions);
     }
 
     public function destroy(Request $request, PostSubscription $postSubscription): JsonResponse
