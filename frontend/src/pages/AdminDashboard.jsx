@@ -292,7 +292,7 @@ function PostReservationsView({ t }) {
           )}
           <div className="flex gap-4 mt-3">
             <span className="text-sm bg-sage/10 text-forest px-3 py-1 rounded-full">{t('admin_dashboard.post_members')}: {subscribers.length}{selectedPost.max_members ? ` / ${selectedPost.max_members}` : ''}</span>
-            {selectedPost.price && <span className="text-sm bg-sage/10 text-forest px-3 py-1 rounded-full">{selectedPost.price} ر.س</span>}
+            {selectedPost.price && <span className="text-sm bg-sage/10 text-forest px-3 py-1 rounded-full">{selectedPost.price} ج.م</span>}
           </div>
         </div>
 
