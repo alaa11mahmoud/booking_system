@@ -63,10 +63,10 @@ export default function VideosPage() {
                         <PlayIcon className="w-12 h-12 text-white/30" />
                       </div>
                     )}
-                    {video.file_url && thumb && (
+                    {video.url && thumb && (
                       <div className="absolute inset-0 flex items-center justify-center">
                         <a
-                          href={video.file_url}
+                          href={video.url}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg transition-transform hover:scale-110"

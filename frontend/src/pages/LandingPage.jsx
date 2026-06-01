@@ -87,7 +87,7 @@ function getYoutubeId(url) {
 }
 
 function VideoCard({ video, idx }) {
-  const videoUrl = video.file_url || video.url || video.video_url;
+  const videoUrl = video.url || video.video_url;
   const youtubeId = getYoutubeId(videoUrl);
   const thumb = youtubeId
     ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`
@@ -215,14 +215,12 @@ export default function LandingPage() {
   }, []);
 
   const isMobile = windowWidth < 768;
-  const displayVideos = [...videos];
+  const displayVideos = videos.length > 0 ? [...videos] : [];
   if (videos.length > 0) {
     while (displayVideos.length < 8) {
       displayVideos.push(...videos);
     }
-    if (displayVideos.length > 12) {
-      displayVideos.length = 12;
-    }
+    displayVideos.length = 8;
   }
 
   return (
@@ -371,6 +369,20 @@ export default function LandingPage() {
             <p className="text-forest/60 mt-3 max-w-xl mx-auto">{t('landing.library_desc')}</p>
           </div>
 
+          {videos.length > INITIAL_VIDEOS && (
+            <div className="text-center mb-8">
+              <Link
+                to="/videos"
+                className="inline-flex items-center gap-2 text-forest hover:text-forest-light font-medium transition-colors border border-sage/40 hover:border-sage px-6 py-2.5 rounded-full hover:bg-sage/5"
+              >
+                {t('landing.show_all', { count: videos.length })}
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </Link>
+            </div>
+          )}
+
           {loading ? (
             <div className="flex items-center justify-center h-80">
               <Skeleton className="w-64 h-64 rounded-full" />
@@ -386,7 +398,7 @@ export default function LandingPage() {
                       const baseRadius = isMobile ? 180 : 320;
                       const radius = N <= 8 ? baseRadius : baseRadius * Math.sin(Math.PI / 8) / Math.sin(Math.PI / N);
 
-                      const videoUrl = video.file_url || video.url || video.video_url;
+                      const videoUrl = video.url || video.video_url;
                       const youtubeId = getYoutubeId(videoUrl);
                       const thumb = youtubeId
                         ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`
@@ -444,19 +456,6 @@ export default function LandingPage() {
                 ))}
               </div>
 
-              {videos.length > INITIAL_VIDEOS && (
-                <div className="text-center mt-12">
-                  <Link
-                    to="/videos"
-                    className="inline-flex items-center gap-2 text-forest hover:text-forest-light font-medium transition-colors border border-sage/40 hover:border-sage px-6 py-2.5 rounded-full hover:bg-sage/5"
-                  >
-                    {t('landing.show_all', { count: videos.length })}
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </Link>
-                </div>
-              )}
             </>
           ) : (
             <p className="text-center text-forest/40 py-16">{t('landing.no_videos')}</p>

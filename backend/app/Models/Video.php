@@ -9,7 +9,6 @@ class Video extends Model
     protected $fillable = [
         'title',
         'url',
-        'file_url',
         'cover_url',
         'description',
         'sort_order',

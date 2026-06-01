@@ -57,14 +57,16 @@ class AdminCmsController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'url' => 'nullable|string|max:255',
-            'file_url' => 'nullable|string|max:255',
+            'url' => 'required|url|max:255',
             'cover_url' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'sort_order' => 'nullable|integer',
+            'is_active' => 'boolean',
         ]);
 
         $video = Video::create($validated);
+
+        Cache::forget('cms_videos');
 
         return response()->json($video, 201);
     }
@@ -77,8 +79,7 @@ class AdminCmsController extends Controller
 
         $validated = $request->validate([
             'title' => 'string|max:255',
-            'url' => 'nullable|string|max:255',
-            'file_url' => 'nullable|string|max:255',
+            'url' => 'required|url|max:255',
             'cover_url' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'sort_order' => 'nullable|integer',
@@ -87,12 +88,15 @@ class AdminCmsController extends Controller
 
         $video->update($validated);
 
+        Cache::forget('cms_videos');
+
         return response()->json($video);
     }
 
     public function deleteVideo(Video $video): JsonResponse
     {
         $video->delete();
+        Cache::forget('cms_videos');
         return response()->json(['message' => __('messages.video_deleted')]);
     }
 
@@ -106,9 +110,12 @@ class AdminCmsController extends Controller
             'title' => 'required|string|max:255',
             'image_url' => 'nullable|string|max:255',
             'sort_order' => 'nullable|integer',
+            'is_active' => 'boolean',
         ]);
 
         $certification = Certification::create($validated);
+
+        Cache::forget('cms_certifications');
 
         return response()->json($certification, 201);
     }
@@ -128,12 +135,15 @@ class AdminCmsController extends Controller
 
         $certification->update($validated);
 
+        Cache::forget('cms_certifications');
+
         return response()->json($certification);
     }
 
     public function deleteCertification(Certification $certification): JsonResponse
     {
         $certification->delete();
+        Cache::forget('cms_certifications');
         return response()->json(['message' => __('messages.certification_deleted')]);
     }
 
@@ -321,9 +331,12 @@ class AdminCmsController extends Controller
             'max_members' => 'required|integer|min:1',
             'image_url' => 'nullable|string|max:255',
             'sort_order' => 'nullable|integer',
+            'is_active' => 'boolean',
         ]);
 
         $post = Post::create($validated);
+
+        Cache::forget('cms_posts');
 
         return response()->json($post, 201);
     }
@@ -348,12 +361,15 @@ class AdminCmsController extends Controller
 
         $post->update($validated);
 
+        Cache::forget('cms_posts');
+
         return response()->json($post);
     }
 
     public function deletePost(Post $post): JsonResponse
     {
         $post->delete();
+        Cache::forget('cms_posts');
         return response()->json(['message' => __('messages.post_deleted')]);
     }
 

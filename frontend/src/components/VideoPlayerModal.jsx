@@ -14,7 +14,7 @@ export default function VideoPlayerModal({ video, onClose }) {
     return () => { document.body.style.overflow = ''; };
   }, []);
 
-  const youtubeId = getYoutubeId(video.file_url || video.url);
+  const youtubeId = getYoutubeId(video.url);
 
   return (
     <div
@@ -42,9 +42,9 @@ export default function VideoPlayerModal({ video, onClose }) {
               allowFullScreen
             />
           </div>
-        ) : video.file_url ? (
+        ) : video.url ? (
           <video
-            src={video.file_url}
+            src={video.url}
             controls
             autoPlay
             className="w-full max-h-[80vh]"
