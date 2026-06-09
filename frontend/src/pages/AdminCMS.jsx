@@ -243,9 +243,7 @@ const today = new Date().toISOString().substring(0, 10);
     <div className="min-h-[90vh] bg-cream py-12 px-4">
       <div className="max-w-5xl mx-auto animate-slide-up">
         <div className="text-center mb-10">
-          <div className="w-16 h-16 rounded-2xl bg-forest/10 border border-forest/20 flex items-center justify-center mx-auto mb-4">
-            <img src="/logo-new.png" alt="د. هالة" className="h-8 w-auto" />
-          </div>
+          <img src="/logo-new.png" alt="د. هالة" className="h-16 w-auto mx-auto mb-4" />
           <h1 className="text-3xl md:text-4xl font-heading font-black text-forest">{t('admin_cms.title')}</h1>
           <p className="text-forest mt-2">{t('admin_cms.subtitle')}</p>
         </div>

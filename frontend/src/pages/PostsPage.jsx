@@ -109,9 +109,7 @@ export default function PostsPage() {
     <div className="min-h-screen bg-cream py-10 px-4" dir="rtl">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-10">
-          <div className="w-16 h-16 rounded-2xl bg-forest/10 border border-forest/20 flex items-center justify-center mx-auto mb-4">
-            <img src="/logo-new.png" alt="د. هالة" className="h-8 w-auto" />
-          </div>
+          <img src="/logo-new.png" alt="د. هالة" className="h-16 w-auto mx-auto mb-4" />
           <h1 className="text-3xl md:text-4xl font-heading font-black text-forest">منشورات د. هالة</h1>
           <p className="text-forest/60 mt-2">جلسات وبرامج وفعاليات</p>
         </div>

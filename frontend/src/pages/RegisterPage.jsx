@@ -33,9 +33,7 @@ export default function RegisterPage() {
     <div className="min-h-[90vh] flex items-center justify-center bg-cream px-4 py-12">
       <div className="w-full max-w-md animate-scale-in">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-forest/10 border border-forest/20 flex items-center justify-center mx-auto mb-4">
-            <img src="/logo-new.png" alt="د. هالة" className="h-8 w-auto" />
-          </div>
+          <img src="/logo-new.png" alt="د. هالة" className="h-16 w-auto mx-auto mb-4" />
           <h1 className="text-2xl font-heading font-black text-forest">{t('register.title')}</h1>
           <p className="text-forest/60 mt-1">{t('register.subtitle')}</p>
         </div>
